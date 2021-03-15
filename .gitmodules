@@ -1,0 +1,3 @@
+[submodule "Stach_PersoClient"]
+	path = Stach_PersoClient
+	url = https://github.com/YayaDiallo/Stach_PersoClient.git
