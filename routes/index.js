@@ -1,12 +1,12 @@
-var express = require('express');
-var router = express.Router();
-var UserModel = require('../models/users');
-var ShopModel = require('../models/shops');
-var CommentModel = require('../models/comments');
-var AppointmentModel = require('../models/appointments');
+const express = require('express');
+const router = express.Router();
+const UserModel = require('../models/users');
+const ShopModel = require('../models/shops');
+const CommentModel = require('../models/comments');
+const AppointmentModel = require('../models/appointments');
 
 /* GET home page. */
-router.get('/', function (req, res, next) {
+router.get('/', function (req, res) {
   res.render('index', { title: 'Express' });
 });
 
@@ -14,7 +14,7 @@ router.get('/', function (req, res, next) {
 utiliser pour page accueil, filtres salon (map et liste)
 --> reducer des données du filtre entre la liste, la map et le detail coiffeur qui servira à remplir le fetch à la bdd
 */
-router.post('/search', async function (req, res, next) {
+router.post('/search', async function (req, res) {
   // console.log('req.body.data', req.body.data);
 
   let type = { $exists: true };
@@ -93,7 +93,7 @@ router.post('/search', async function (req, res, next) {
   // console.log("req.body.latitude", req.body.latitude)
   // console.log("req.body.longitude", req.body.longitude)
 
-  var shopsList = await ShopModel.find({
+  let shopsList = await ShopModel.find({
     offers: {
       $elemMatch: {
         type: quoi,
@@ -158,17 +158,17 @@ router.post('/search', async function (req, res, next) {
   let distanceMax = 4;
 
   function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-    var R = 3963; // Radius of the earth in miles
-    var dLat = deg2rad(lat2 - lat1); // deg2rad below
-    var dLon = deg2rad(lon2 - lon1);
-    var a =
+    let R = 3963; // Radius of the earth in miles
+    let dLat = deg2rad(lat2 - lat1); // deg2rad below
+    let dLon = deg2rad(lon2 - lon1);
+    let a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(deg2rad(lat1)) *
         Math.cos(deg2rad(lat2)) *
         Math.sin(dLon / 2) *
         Math.sin(dLon / 2);
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    var d = R * c; // Distance in miles
+    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    let d = R * c; // Distance in miles
     return d;
   }
 
@@ -203,8 +203,8 @@ router.post('/search', async function (req, res, next) {
 });
 
 // route pour enregistrer les shops via postman - NE PAS EFFACER LES CHAMPS COMMENTÉS //
-router.post('/addShop', async function (req, res, next) {
-  var newShop = new ShopModel({
+router.post('/addShop', async function (req, res) {
+  let newShop = new ShopModel({
     shopName: req.body.shopName,
     shopImages: [
       req.body.shopImage1,
@@ -254,10 +254,10 @@ router.post('/addShop', async function (req, res, next) {
         duration: req.body.offerDuration5,
       },
       {
-        type: req.body.offerName6, 
-        price: req.body.offerPrice6, 
-        duration: req.body.offerDuration6
-      }
+        type: req.body.offerName6,
+        price: req.body.offerPrice6,
+        duration: req.body.offerDuration6,
+      },
     ],
     packages: [
       {
@@ -273,16 +273,16 @@ router.post('/addShop', async function (req, res, next) {
         description: req.body.packageDescription2,
       },
       // {
-      //   type: req.body.packageName3, 
-      //   price: req.body.packagePrice3, 
-      //   duration: req.body.packageDuration3, 
+      //   type: req.body.packageName3,
+      //   price: req.body.packagePrice3,
+      //   duration: req.body.packageDuration3,
       //   description: req.body.packageDescription3
       // }
     ],
     schedule: [
       // {
-      //   dayOfTheWeek: 'Monday', 
-      //   openingHours: req.body.openingHoursMonday, 
+      //   dayOfTheWeek: 'Monday',
+      //   openingHours: req.body.openingHoursMonday,
       //   closingHours: req.body.closingHoursMonday
       // },
       {
@@ -310,11 +310,11 @@ router.post('/addShop', async function (req, res, next) {
         openingHours: req.body.openingHoursSaturday,
         closingHours: req.body.closingHoursSaturday,
       },
-    //   {
-    //   dayOfTheWeek: 'Sunday', 
-    //   openingHours: req.body.openingHoursSunday, 
-    //   closingHours: req.body.closingHoursSunday
-    // },
+      //   {
+      //   dayOfTheWeek: 'Sunday',
+      //   openingHours: req.body.openingHoursSunday,
+      //   closingHours: req.body.closingHoursSunday
+      // },
     ],
     atHome: req.body.atHome,
     rating: 0,
@@ -327,18 +327,18 @@ router.post('/addShop', async function (req, res, next) {
   res.json({ result: true });
 });
 
-router.put('/addPriceFork', async function (req, res, next) {
-  var shop = await ShopModel.findOne({ shopName: req.body.shopName });
+router.put('/addPriceFork', async function (req, res) {
+  let shop = await ShopModel.findOne({ shopName: req.body.shopName });
 
-  var totalPrice = 0;
-  var numberOfOffer = 0;
+  let totalPrice = 0;
+  let numberOfOffer = 0;
   for (let i = 0; i < shop.offers.length; i++) {
     totalPrice += shop.offers[i].price;
     numberOfOffer++;
   }
-  var averagePrice = totalPrice / numberOfOffer;
+  let averagePrice = totalPrice / numberOfOffer;
 
-  var priceFork;
+  let priceFork;
   if (averagePrice < 50) {
     priceFork = 1;
   } else if (averagePrice < 70) {
@@ -358,9 +358,9 @@ router.put('/addPriceFork', async function (req, res, next) {
 /* route de validation de la base de données 
   -> reducer stockant toutes les infos du rdv choisis (reducer créé au moment de la validation du rdv sur la page détail coiffeur)  
 */
-router.post('/addappointment/:token', async function (req, res, next) {
+router.post('/addappointment/:token', async function (req, res) {
   console.log(req.body.loyaltyPoints);
-  var newAppointment = new AppointmentModel({
+  let newAppointment = new AppointmentModel({
     chosenOffer: req.body.chosenOffer,
     chosenPrice: req.body.chosenPrice,
     chosenEmployee: req.body.chosenEmployee,
@@ -372,7 +372,7 @@ router.post('/addappointment/:token', async function (req, res, next) {
     commentExists: false,
   });
 
-  var saveAppointment = await newAppointment.save();
+  let saveAppointment = await newAppointment.save();
 
   await ShopModel.updateOne(
     { _id: req.body.shop_id },
@@ -381,16 +381,17 @@ router.post('/addappointment/:token', async function (req, res, next) {
 
   await UserModel.updateOne(
     { token: req.params.token },
-    { $push: { appointments: saveAppointment._id },
-      $inc: {loyaltyPoints: req.body.loyaltyPoints},
+    {
+      $push: { appointments: saveAppointment._id },
+      $inc: { loyaltyPoints: req.body.loyaltyPoints },
     }
   );
 
   res.json({ result: true });
 });
 
-router.get('/shop/:id', async function (req, res, next) {
-  var shop = await ShopModel.findById(req.params.id)
+router.get('/shop/:id', async function (req, res) {
+  let shop = await ShopModel.findById(req.params.id)
     .populate('appointments')
     .populate('comments')
     .exec();
@@ -399,46 +400,40 @@ router.get('/shop/:id', async function (req, res, next) {
   res.json({ result: true, shop: shop });
 });
 
+router.get('/favorites', async function (req, res) {
+  let favoriteShops = await UserModel.findOne({ token: req.query.token });
+  // console.log(favoriteShops.favorites)
+  let listID = [];
+  favoriteShops.favorites.forEach((item) => {
+    listID.push(item);
+  });
 
-router.get('/favorites', async function (req, res, next){
-  
-  var favoriteShops = await UserModel.findOne({token: req.query.token})
-// console.log(favoriteShops.favorites)
-var listID = []
-favoriteShops.favorites.forEach((item)=>{
-  listID.push(item)
-})
+  // console.log(listID)
+  // db.collection.find( { _id : { $in : [ObjectId('1'),ObjectId('2')] } } );
+  let foundFavorites = await ShopModel.find({ _id: { $in: listID } })
+    .populate('comments')
+    .populate('appointments')
+    .exec();
+  // console.log("FOUND", foundFavorites)
+  res.json({ result: true, favoriteShops: foundFavorites });
+});
 
-// console.log(listID)
-// db.collection.find( { _id : { $in : [ObjectId('1'),ObjectId('2')] } } );
- var foundFavorites =  await ShopModel.find({_id: { $in: listID} }).populate('comments').populate('appointments').exec()
-// console.log("FOUND", foundFavorites)
-  res.json({result: true, favoriteShops: foundFavorites})
-})
-
-router.post('/favorites', async function (req, res, next){
-  
-    await UserModel.updateMany(
-    {token : req.body.token},
-    {$push : {favorites: req.body.id}}
-    )
-    
-
-    res.json({result: true})
-
-})
-
-
-router.post('/deleteFavorites', async function (req, res, next){
-  
+router.post('/favorites', async function (req, res) {
   await UserModel.updateMany(
-  {token : req.body.token},
-  {$pull : {favorites: req.body.id}}
-  )
+    { token: req.body.token },
+    { $push: { favorites: req.body.id } }
+  );
 
-  res.json({result: true})
+  res.json({ result: true });
+});
 
-})
+router.post('/deleteFavorites', async function (req, res) {
+  await UserModel.updateMany(
+    { token: req.body.token },
+    { $pull: { favorites: req.body.id } }
+  );
+
+  res.json({ result: true });
+});
 
 module.exports = router;
-
